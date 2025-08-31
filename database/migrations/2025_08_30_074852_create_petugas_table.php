@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kelas', function (Blueprint $table) {
+        Schema::create('petugas', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kelas');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('nip')->unique();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kelas');
+        Schema::dropIfExists('petugas');
     }
 };
