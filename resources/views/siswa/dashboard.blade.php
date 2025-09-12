@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Siswa</title>
-</head>
-<body>
-    <h1>Ini dashboard siswa</h1>
-</body>
-</html>
+<x-app-layout>
+    <h1 class="text-2xl font-bold mb-4">Dashboard siswa</h1>
+    <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-gray-700">
+            Selamat datang di dashboard siswa. Silakan pilih menu di sidebar untuk mengelola data.
+        </p>
+    </div>
+</x-app-layout>

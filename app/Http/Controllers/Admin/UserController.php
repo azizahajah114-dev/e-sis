@@ -13,7 +13,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::whereIn('role', ['siswa', 'petugas'])->get();
+        $users = User::whereIn('role', ['siswa', 'petugas'])->paginate(10);
 
         return view('admin.users.index', compact('users'));
     }
@@ -45,7 +45,7 @@ class UserController extends Controller
             'role' => $request->role,
         ]);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan');
+        return redirect()->route('admin.data-pengguna')->with('success', 'Pengguna berhasil ditambahkan');
     }
 
     /**
@@ -74,7 +74,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui');
+        return redirect()->route('admin.data-pengguna')->with('success', 'Pengguna berhasil diperbarui');
     }
 
     /**
@@ -83,6 +83,6 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus');
+        return redirect()->route('admin.data-pengguna')->with('success', 'Pengguna berhasil dihapus');
     }
 }
