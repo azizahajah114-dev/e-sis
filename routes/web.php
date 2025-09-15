@@ -7,7 +7,10 @@ use App\Http\Controllers\Admin\PetugasController;
 use App\Http\Controllers\Admin\SiswaLengkapController;
 use App\Http\Controllers\Admin\WaliKelasController;
 use App\Http\Controllers\Admin\IzinController;
+use App\Http\Controllers\Admin\ValidasiController;
+use App\Http\Controllers\Siswa\IzinController as IzinSiswaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Siswa\ProfilController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +30,7 @@ Route::middleware('auth')->group(function () {
 
 // Route untuk Admin (bisa admin & petugas)
 Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(function () {
+    // Route Dashboard Admin
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
@@ -79,17 +83,65 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
     Route::put('/petugas/edit/{petugas}', [PetugasController::class, 'update'])->name('admin.petugas.update');
     Route::delete('/petugas/destroy/{petugas}', [PetugasController::class, 'destroy'])->name('admin.petugas.destroy');
 
+    // Validasi izin (oleh admin/petugas)
+    Route::get('admin/validasi', [ValidasiController::class, 'index'])->name('admin.validasi.index');
+    Route::get('admin/validasi/{id}', [ValidasiController::class, 'show'])->name('admin.validasi.show');
+    Route::post('admin/validasi/{id}', [ValidasiController::class, 'proses'])->name('admin.validasi.proses');
+
+
+
+
     // Route Laporan Izin
     Route::get('/admin/izin', [IzinController::class, 'index'])->name('admin.izin.index');
-
 });
 
 // Route untuk Siswa (hanya siswa)
 Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
+    // Route Dashboard Siswa
     Route::get('/dashboard', function () {
         return view('siswa.dashboard');
     })->name('siswa.dashboard');
 
+    // Route Manajemen Biodata Siswa
+    Route::prefix('profil')->group(function () {
+        Route::get('/', [ProfilController::class, 'profil'])->name('siswa.profil');
+
+        // Data diri siswa
+        Route::get('/data-diri', [ProfilController::class, 'dataDiri'])->name('siswa.profil.data-diri');
+        Route::get('/data-diri/edit', [ProfilController::class, 'editDataDiri'])->name('siswa.profil.data-diri.edit');
+        Route::put('/data-diri', [ProfilController::class, 'updateDataDiri'])->name('siswa.profil.data-diri.update');
+
+        // Pengaturan siswa
+        Route::get('/pengaturan', [ProfilController::class, 'pengaturan'])->name('siswa.profil.pengaturan');
+        Route::get('/pengaturan/password', [ProfilController::class, 'editPassword'])->name('siswa.profil.pengaturan.password.edit');
+        Route::put('/pengaturan/password', [ProfilController::class, 'updatePassword'])->name('siswa.profil.pengaturan.password.update');
+
+        // Walikelas
+        Route::get('/walikelas', [ProfilController::class, 'walikelas'])->name('siswa.profil.walikelas');
+
+
+        // Route Manajemen Pengajuan Form
+        Route::get('/form-izin')->name('form-izin');
+        Route::post('/form-izin')->name('form-izin.store');
+    });
+
+    // Route Manajemen Pengajuan Izin
+    // Formulir pengajuan izin (tahap 1)
+    Route::get('/izin', [IzinSiswaController::class, 'create'])->name('izin.create');
+    Route::post('/izin', [IzinSiswaController::class, 'store'])->name('izin.store');
+
+    // Upload bukti izin (tahap 2)
+    Route::get('/izin/upload/{izin}', [IzinSiswaController::class, 'uploadForm'])->name('izin.upload.form');
+    Route::post('/izin/upload/{izin}', [IzinSiswaController::class, 'uploadBukti'])->name('izin.upload');
+
+    // Halaman QR setelah izin berhasil
+    Route::get('/izin/qr/{id}', [IzinSiswaController::class, 'showQr'])->name('siswa.izin.qr');
+
+    // Cetak izin (berdasarkan QR Code)
+    Route::get('/siswa/izin/cetak/{id}', [IzinSiswaController::class, 'cetak'])->name('siswa.izin.cetak');
+
+    // Riwayat izin siswa
+    Route::get('/izin/riwayat', [IzinSiswaController::class, 'riwayat'])->name('izin.riwayat');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

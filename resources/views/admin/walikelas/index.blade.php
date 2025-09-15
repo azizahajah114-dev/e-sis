@@ -15,6 +15,7 @@
                 <tr class="bg-gray-200">
                     <th class="p-2 border">No</th>
                     <th class="p-2 border">Nama Wali Kelas</th>
+                    <th class="p-2 border">No HP</th>
                     <th class="p-2 border">Kelas</th>
                     <th class="p-2 border">Status</th>
                     <th class="p-2 border">Aksi</th>
@@ -25,6 +26,7 @@
                     <tr>
                         <td class="p-2 border">{{ $index+1 }}</td>
                         <td class="p-2 border">{{ $w->nama_walikelas }}</td>
+                        <td class="p-2 border">{{ $w->nomor_hp }}</td>
                         <td class="p-2 border">{{ $w->kelas->nama_kelas }}</td>
                         <td class="p-2 border">{{ ucfirst($w->status) }}</td>
                         <td class="p-2 border space-x-2">

@@ -21,7 +21,7 @@
             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'petugas']))
                 @include('layouts.partials.nav-admin')
             @elseif(auth()->check() && auth()->user()->role === 'siswa')
-                @include('layouts.partials.nav-user')
+                @include('layouts.partials.nav-siswa')
             @endif
 
             <!-- Main Content -->

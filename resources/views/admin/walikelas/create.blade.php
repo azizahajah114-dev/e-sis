@@ -14,10 +14,16 @@
                 <select name="kelas_id" class="w-full border p-2 rounded" required>
                     <option value="">-- Pilih Kelas --</option>
                     @foreach($kelas as $k)
-                        <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                    <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
                     @endforeach
                 </select>
             </div>
+
+            <div>
+                <label class="block">No HP</label>
+                <input type="text" name="nomor_hp" class="w-full border p-2 rounded" required>
+            </div>
+
 
             <div>
                 <label class="block">Status</label>

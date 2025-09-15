@@ -52,7 +52,20 @@ class User extends Authenticatable
         return $this->hasOne(SiswaLengkap::class, 'user_id');
     }
 
-    public function petugas() {
+    public function petugas()
+    {
         return $this->hasOne(Petugas::class, 'user_id');
+    }
+
+    public function walikelas()
+    {
+        return $this->hasOneThrough(
+            WaliKelas::class,
+            SiswaLengkap::class, // perantara
+            'user_id',           // foreign key di siswa_lengkap
+            'kelas_id',          // foreign key di wali_kelas
+            'id',                // user.id -> siswa_lengkap.user_id
+            'kelas_id'           // siswa_lengkap.kelas_id -> walikelas.kelas_id
+        );
     }
 }

@@ -25,11 +25,18 @@ class WaliKelasController extends Controller
     {
         $request->validate([
             'nama_walikelas' => 'required|string|max:255',
+            'nomor_hp' => [
+                'required',
+                'regex:/^62[0-9]{9,13}$/', // Harus mulai dengan 62 dan panjang 11–15 digit
+            ],
             'kelas_id' => 'required|exists:kelas,id',
             'status' => 'required|in:aktif,nonaktif',
+        ], [
+            'nomor_hp.required' => 'Nomor HP wajib diisi',
+            'nomor_hp.regex' => 'Nomor HP harus menggunakan format global. Contoh: 6281234567890',
         ]);
 
-        WaliKelas::create($request->all());
+        WaliKelas::create($request->only(['nama_walikelas', 'nomor_hp', 'kelas_id', 'status']));
 
         return redirect()->route('admin.data-walikelas')->with('success', 'Data wali kelas berhasil ditambahkan');
     }
@@ -44,11 +51,18 @@ class WaliKelasController extends Controller
     {
         $request->validate([
             'nama_walikelas' => 'required|string|max:255',
+            'nomor_hp' => [
+                'required',
+                'regex:/^62[0-9]{9,13}$/',
+            ],
             'kelas_id' => 'required|exists:kelas,id',
             'status' => 'required|in:aktif,nonaktif',
+        ], [
+            'nomor_hp.required' => 'Nomor HP wajib diisi',
+            'nomor_hp.regex' => 'Nomor HP harus menggunakan format global. Contoh: 6281234567890',
         ]);
 
-        $walikelas->update($request->all());
+        $walikelas->update($request->only(['nama_walikelas', 'nomor_hp', 'kelas_id', 'status']));
 
         return redirect()->route('admin.data-walikelas')->with('success', 'Data wali kelas berhasil diperbarui');
     }

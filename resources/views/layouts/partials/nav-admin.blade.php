@@ -32,6 +32,10 @@
             class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.data-kelas*') ? 'bg-gray-700' : '' }}">
             Data Petugas
         </a>
+        <a href="{{ route('admin.validasi.index')}}"
+            class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.data-kelas*') ? 'bg-gray-700' : '' }}">
+            Validasi Izin
+        </a>
         <a href="{{ route('admin.izin.index')}}"
             class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.data-kelas*') ? 'bg-gray-700' : '' }}">
             Laporan Izin

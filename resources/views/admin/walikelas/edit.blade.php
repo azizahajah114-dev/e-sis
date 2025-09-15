@@ -7,20 +7,27 @@
 
             <div>
                 <label class="block">Nama Wali Kelas</label>
-                <input type="text" name="nama_walikelas" class="w-full border p-2 rounded" 
-                       value="{{ $walikelas->nama_walikelas }}" required>
+                <input type="text" name="nama_walikelas" class="w-full border p-2 rounded"
+                    value="{{ $walikelas->nama_walikelas }}" required>
             </div>
 
             <div>
                 <label class="block">Kelas</label>
                 <select name="kelas_id" class="w-full border p-2 rounded" required>
                     @foreach($kelas as $k)
-                        <option value="{{ $k->id }}" {{ $walikelas->kelas_id == $k->id ? 'selected' : '' }}>
-                            {{ $k->nama_kelas }}
-                        </option>
+                    <option value="{{ $k->id }}" {{ $walikelas->kelas_id == $k->id ? 'selected' : '' }}>
+                        {{ $k->nama_kelas }}
+                    </option>
                     @endforeach
                 </select>
             </div>
+
+            <div>
+                <label class="block">No HP</label>
+                <input type="text" name="nomor_hp" class="w-full border p-2 rounded" value="{{ $walikelas->nomor_hp }}"
+                    required>
+            </div>
+
 
             <div>
                 <label class="block">Status</label>

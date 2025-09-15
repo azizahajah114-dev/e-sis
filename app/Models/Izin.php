@@ -18,7 +18,10 @@ class Izin extends Model
         'jenis_izin',
         'keterangan',
         'jam_keluar',
+        'jam_kembali',
         'tanggal',
+        'qr_code',
+        'bukti_izin',
         'status_izin',
         'disetujui_oleh',
     ];
@@ -44,6 +47,11 @@ class Izin extends Model
     // Relasi ke walikelas
     public function walikelas()
     {
-        return $this->belongsTo(Walikelas::class, 'id_walikelas');
+        return $this->belongsTo(WaliKelas::class, 'id_walikelas');
+    }
+
+    public function petugas()
+    {
+        return $this->belongsTo(Petugas::class, 'id_petugas');
     }
 }
