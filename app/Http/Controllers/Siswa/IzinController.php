@@ -36,62 +36,67 @@ class IzinController extends Controller
 
 
     // Simpan izin (tahap 1)
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nis'          => 'required|exists:users,nis',
-            'jenis_izin'   => 'required|in:sakit,izin',
-            'keterangan'   => 'nullable|string',
-            'jam_keluar'   => 'required',
-            'id_walikelas' => 'required|exists:walikelas,id',
-        ]);
+    // Simpan izin (tahap 1)
+public function store(Request $request)
+{
+    $request->validate([
+        'nis'          => 'required|exists:users,nis',
+        'jenis_izin'   => 'required|in:sakit,izin',
+        'keterangan'   => 'nullable|string',
+        'jam_keluar'   => 'required',
+        'id_walikelas' => 'required|exists:walikelas,id',
+    ]);
 
-        // cari user dari NIS
-        $user = User::where('nis', $request->nis)->first();
+    // cari user dari NIS
+    $user = User::where('nis', $request->nis)->first();
 
-        // ambil petugas aktif (misal 1 orang saja yang statusnya aktif)
-        $petugas = Petugas::where('status', 'aktif')
-            ->first();
-
-        if (!$petugas) {
-            return back()->with('error', 'Tidak ada petugas aktif, hubungi admin.');
-        }
-
-        // buat izin baru
-        $izin = Izin::create([
-            'user_id'      => $user->id,
-            'id_walikelas' => $request->id_walikelas,
-            'jenis_izin'   => $request->jenis_izin,
-            'keterangan'   => $request->keterangan,
-            'jam_keluar'   => $request->jam_keluar,
-            'tanggal'      => now()->toDateString(),
-            'status_izin'  => 'baru',
-        ]);
-
-        // generate qr code berisi url cetak + id walikelas & id petugas
-        $qrCodeUrl = route('siswa.izin.cetak', $izin->id) .
-            '?id_walikelas=' . $izin->id_walikelas .
-            '&id_petugas=' . $petugas->id;
-
-        $result = Builder::create()
-            ->writer(new PngWriter())   // pastikan pakai PNG writer
-            ->data($qrCodeUrl)
-            ->size(200)
-            ->margin(10)
-            ->build();
-
-        // simpan ke storage
-        $qrCodePath = 'qrcodes/izin_' . $izin->id . '.png';
-        Storage::disk('public')->put($qrCodePath, $result->getString());
-
-        // update path ke DB
-        $izin->update([
-            'qr_code' => $qrCodePath,
-        ]);
-
-        return redirect()->route('siswa.izin.qr', $izin->id)
-            ->with('success', 'Pengajuan izin berhasil, silakan cetak lembar izin.');
+    // ambil petugas aktif
+    $petugas = Petugas::where('status', 'aktif')->first();
+    if (!$petugas) {
+        return back()->with('error', 'Tidak ada petugas aktif, hubungi admin.');
     }
+
+    // buat izin baru
+    $izin = Izin::create([
+        'user_id'      => $user->id,
+        'id_walikelas' => $request->id_walikelas,
+        'jenis_izin'   => $request->jenis_izin,
+        'keterangan'   => $request->keterangan,
+        'jam_keluar'   => $request->jam_keluar,
+        'tanggal'      => now()->toDateString(),
+        'status_izin'  => 'baru',
+    ]);
+
+    // ✅ pakai nama route yang benar
+    $qrCodeUrl = route('izin.cetak', $izin->id) .
+        '?id_walikelas=' . $izin->id_walikelas .
+        '&id_petugas=' . $petugas->id;
+
+    $result = Builder::create()
+        ->writer(new PngWriter())   // pakai PNG writer
+        ->data($qrCodeUrl)
+        ->size(200)
+        ->margin(10)
+        ->build();
+
+    // pastikan folder qrcodes ada
+    if (!Storage::disk('public')->exists('qrcodes')) {
+        Storage::disk('public')->makeDirectory('qrcodes');
+    }
+
+    // simpan ke storage
+    $qrCodePath = 'qrcodes/izin_' . $izin->id . '.png';
+    Storage::disk('public')->put($qrCodePath, $result->getString());
+
+    // update DB
+    $izin->update([
+        'qr_code' => $qrCodePath,
+    ]);
+
+    return redirect()->route('izin.qr', $izin->id)
+        ->with('success', 'Pengajuan izin berhasil, silakan cetak lembar izin.');
+}
+
 
     public function showQr($id)
     {

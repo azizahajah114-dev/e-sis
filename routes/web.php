@@ -37,6 +37,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
 
     // Route Manajemen Data Pengguna
     Route::get('/data-pengguna', [UserController::class, 'index'])->name('admin.data-pengguna');
+    Route::get('/data-pengguna/{kelasId}', [UserController::class, 'byKelas'])->name('admin.data-pengguna.kelas');
+    Route::post('/admin/data-pengguna/import', [UserController::class, 'import'])
+    ->name('admin.data-pengguna.import');
     Route::get('/users/create', [UserController::class, 'create'])->name('admin.form-tambah-pengguna');
     Route::post('users/create', [UserController::class, 'store'])->name('admin.users.store');
     Route::get('/users/edit/{user}', [UserController::class, 'edit'])->name('admin.form-edit-pengguna');
@@ -135,10 +138,10 @@ Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
     Route::post('/izin/upload/{izin}', [IzinSiswaController::class, 'uploadBukti'])->name('izin.upload');
 
     // Halaman QR setelah izin berhasil
-    Route::get('/izin/qr/{id}', [IzinSiswaController::class, 'showQr'])->name('siswa.izin.qr');
+    Route::get('/izin/qr/{id}', [IzinSiswaController::class, 'showQr'])->name('izin.qr');
 
     // Cetak izin (berdasarkan QR Code)
-    Route::get('/siswa/izin/cetak/{id}', [IzinSiswaController::class, 'cetak'])->name('siswa.izin.cetak');
+    Route::get('/siswa/izin/cetak/{id}', [IzinSiswaController::class, 'cetak'])->name('izin.cetak');
 
     // Riwayat izin siswa
     Route::get('/izin/riwayat', [IzinSiswaController::class, 'riwayat'])->name('izin.riwayat');
