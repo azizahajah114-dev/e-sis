@@ -37,6 +37,10 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
 
     // Route Manajemen Data Pengguna
     Route::get('/data-pengguna', [UserController::class, 'index'])->name('admin.data-pengguna');
+    Route::get('/data-pengguna/{kelasId}', [UserController::class, 'byKelas'])->name('admin.data-pengguna.kelas');
+    Route::post('/data-pengguna/{kelasId}/import', [UserController::class, 'import'])->name('admin.data-pengguna.import');
+    Route::post('data-pengguna/import-global', [UserController::class, 'importGlobal'])
+    ->name('admin.data-pengguna.import.global');
     Route::get('/users/create', [UserController::class, 'create'])->name('admin.form-tambah-pengguna');
     Route::post('users/create', [UserController::class, 'store'])->name('admin.users.store');
     Route::get('/users/edit/{user}', [UserController::class, 'edit'])->name('admin.form-edit-pengguna');

@@ -21,7 +21,8 @@ class User extends Authenticatable
         'nama',
         'nis',
         'password',
-        'role'
+        'role',
+        'kelas_id'
     ];
 
     /**
@@ -67,5 +68,10 @@ class User extends Authenticatable
             'id',                // user.id -> siswa_lengkap.user_id
             'kelas_id'           // siswa_lengkap.kelas_id -> walikelas.kelas_id
         );
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 }

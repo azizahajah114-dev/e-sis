@@ -3,24 +3,55 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
+use App\Models\Kelas;
 use App\Http\Controllers\Controller;
+use App\Imports\UserImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
-    /**
-     * Tampilkan semua pengguna (hanya siswa & petugas).
-     */
+
     public function index()
     {
-        $users = User::whereIn('role', ['siswa', 'petugas'])->paginate(10);
-
-        return view('admin.users.index', compact('users'));
+        $kelas = Kelas::all();
+        return view('admin.users.index', compact('kelas'));
     }
 
-    /**
-     * Tampilkan form tambah pengguna.
-     */
+
+    public function byKelas($id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        $users = User::where('kelas_id', $id)->get();
+
+        return view('admin.users.byKelas', compact('users', 'kelas'));
+    }
+
+    public function import(Request $request, $kelasId)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls'
+        ]);
+
+        // Import tanpa kelas_id
+        Excel::import(new UserImport, $request->file('file'));
+
+        return redirect()->route('admin.data-pengguna.kelas', $kelasId)
+            ->with('success', 'Data berhasil diimport!');
+    }
+
+    public function importGlobal(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls'
+        ]);
+
+        Excel::import(new UserImport, $request->file('file'));
+
+        return redirect()->route('admin.data-pengguna')
+            ->with('success', 'Data berhasil diimport!');
+    }
+
     public function create()
     {
         return view('admin.users.create');

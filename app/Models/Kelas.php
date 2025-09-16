@@ -12,7 +12,12 @@ class Kelas extends Model
     protected $table = 'kelas';
     protected $fillable = ['nama_kelas'];
 
-    public function siswaLengkao() {
-        return $this->hasOne(SiswaLengkap::class, 'kelas_id');
+    public function siswaLengkap() {
+        return $this->hasMany(SiswaLengkap::class, 'kelas_id');
+    }
+
+     public function users()
+    {
+        return $this->hasMany(User::class, 'kelas_id');
     }
 }

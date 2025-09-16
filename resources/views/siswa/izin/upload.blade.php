@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="p-6">
+    <div class="p-6 text-white">
         <h1 class="text-xl font-bold mb-4">Upload Bukti Izin</h1>
 
         @if(session('success'))

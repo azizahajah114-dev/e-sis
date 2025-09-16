@@ -1,64 +1,25 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto p-6">
-        <h1 class="text-2xl font-bold mb-6 text-white">Data Pengguna</h1>
+    <x-slot name="header">
+        <h1 class="text-xl font-bold">Daftar Kelas</h1>
+    </x-slot>
 
-        <!-- Alert Success -->
-        @if(session('success'))
-            <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
+    {{-- Form Import Global --}}
+    <form action="{{ route('admin.data-pengguna.import.global') }}" method="POST" enctype="multipart/form-data"
+          class="flex items-center space-x-2 mb-6">
+        @csrf
+        <input type="file" name="file" class="border rounded p-1" required>
+        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            Import Excel
+        </button>
+    </form>
 
-        <!-- Tombol Tambah -->
-        <div class="mb-4">
-            <a href="{{ route('admin.form-tambah-pengguna') }}" 
-               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                + Tambah Pengguna
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        @foreach ($kelas as $k)
+            <a href="{{ route('admin.data-pengguna.kelas', $k->id) }}"
+               class="block p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
+                <h2 class="text-lg font-semibold">{{ $k->nama_kelas }}</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Lihat pengguna kelas ini</p>
             </a>
-        </div>
-
-        <!-- Tabel -->
-        <div class="overflow-x-auto bg-white rounded-lg shadow">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="px-4 py-2 border">#</th>
-                        <th class="px-4 py-2 border">Nama</th>
-                        <th class="px-4 py-2 border">NIS</th>
-                        <th class="px-4 py-2 border">Role</th>
-                        <th class="px-4 py-2 border">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($users as $index => $user)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-2 border">{{ $users->firstItem() + $index }}</td>
-                            <td class="px-4 py-2 border">{{ $user->nama }}</td>
-                            <td class="px-4 py-2 border">{{ $user->nis }}</td>
-                            <td class="px-4 py-2 border capitalize">{{ $user->role }}</td>
-                            <td class="px-4 py-2 border">
-                                <a href="{{ route('admin.form-edit-pengguna', $user->id) }}" 
-                                   class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</a>
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" 
-                                      method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" 
-                                            onclick="return confirm('Yakin ingin menghapus pengguna ini?')"
-                                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
-                                        Hapus
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            <!-- Pagination -->
-            <div class="p-4">
-                {{ $users->links() }}
-            </div>
-        </div>
+        @endforeach
     </div>
 </x-app-layout>
