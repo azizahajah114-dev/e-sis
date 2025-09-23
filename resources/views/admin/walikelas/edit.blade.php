@@ -2,7 +2,8 @@
     <div class="p-6">
         <h2 class="text-xl font-bold mb-4">Edit Wali Kelas</h2>
 
-        <form action="{{ route('admin.walikelas.update', $walikelas->id) }}" method="POST" class="space-y-4">
+        <form action="{{ route('admin.walikelas.update', $walikelas->id) }}" enctype="multipart/form-data" method="POST"
+            class="space-y-4">
             @csrf @method('PUT')
 
             <div>
@@ -36,6 +37,13 @@
                     <option value="nonaktif" {{ $walikelas->status == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                 </select>
             </div>
+
+            <div>
+                <label class="block">Foto Profil</label>
+                <input type="file" name="foto" class="w-full border p-2 rounded" accept="image/*">
+            </div>
+
+
 
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
         </form>

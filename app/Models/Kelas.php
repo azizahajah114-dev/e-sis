@@ -20,4 +20,16 @@ class Kelas extends Model
     {
         return $this->hasMany(User::class, 'kelas_id');
     }
+
+    public function izin()
+    {
+        return $this->hasManyThrough(
+            Izin::class,   // model tujuan
+            User::class,   // model perantara
+            'kelas_id',    // FK di tabel users -> kelas
+            'user_id',     // FK di tabel izin -> user
+            'id',          // PK kelas
+            'id'           // PK user
+        );
+    }
 }

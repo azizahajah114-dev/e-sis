@@ -1,7 +1,7 @@
 <x-app-layout>
-    <x-slot name="header">
+    <div class="py-6">
         <h1 class="text-xl font-bold">Pengguna Kelas {{ $kelas->nama_kelas }}</h1>
-    </x-slot>
+    </div>
 
     {{-- Form Import --}}
    {{-- <form action="{{ route('admin.data-pengguna.import', $kelas->id) }}" method="POST" enctype="multipart/form-data"
@@ -15,8 +15,8 @@
 
     {{-- Table User --}}
     <div class="overflow-x-auto">
-        <table class="w-full border text-left">
-            <thead class="bg-gray-200 dark:bg-gray-800">
+        <table class="w-full border text-left bg-white shadow-lg">
+            <thead class="bg-[#017BFA] text-black">
                 <tr>
                     <th class="p-2">Nama</th>
                     <th class="p-2">NIS</th>

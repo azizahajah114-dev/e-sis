@@ -11,6 +11,10 @@ use App\Http\Controllers\Admin\ValidasiController;
 use App\Http\Controllers\Siswa\IzinController as IzinSiswaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\ProfilController;
+use App\Http\Controllers\Admin\DashboardController as DashboardAdminController;
+use App\Exports\UserFormatExport;
+use App\Http\Controllers\Admin\UserExportController;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,16 +35,16 @@ Route::middleware('auth')->group(function () {
 // Route untuk Admin (bisa admin & petugas)
 Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(function () {
     // Route Dashboard Admin
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
 
     // Route Manajemen Data Pengguna
     Route::get('/data-pengguna', [UserController::class, 'index'])->name('admin.data-pengguna');
+    Route::get('/data-pengguna/search', [UserController::class, 'searchKelas'])->name('admin.data-pengguna.search');
     Route::get('/data-pengguna/{kelasId}', [UserController::class, 'byKelas'])->name('admin.data-pengguna.kelas');
     Route::post('/data-pengguna/{kelasId}/import', [UserController::class, 'import'])->name('admin.data-pengguna.import');
     Route::post('data-pengguna/import-global', [UserController::class, 'importGlobal'])
-    ->name('admin.data-pengguna.import.global');
+        ->name('admin.data-pengguna.import.global');
+    Route::post('/data-pengguna/download-format', [UserController::class, 'downloadFormat'])->name('admin.data-pengguna.download-format');
     Route::get('/users/create', [UserController::class, 'create'])->name('admin.form-tambah-pengguna');
     Route::post('users/create', [UserController::class, 'store'])->name('admin.users.store');
     Route::get('/users/edit/{user}', [UserController::class, 'edit'])->name('admin.form-edit-pengguna');
@@ -49,6 +53,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
 
     // Route Manajemen Data Kelas
     Route::get('/data-kelas', [KelasController::class, 'index'])->name('admin.data-kelas');
+    Route::get('/kelas/search', [KelasController::class, 'search'])->name('admin.kelas.search');
     Route::get('/kelas/create', [KelasController::class, 'create'])->name('admin.form-tambah-kelas');
     Route::post('kelas/create', [KelasController::class, 'store'])->name('admin.kelas.store');
     Route::get('/kelas/edit/{kelas}', [KelasController::class, 'edit'])->name('admin.form-edit-kelas');
@@ -65,14 +70,16 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
 
     // Route Manajemen Data Siswa
     Route::get('/data-siswa', [SiswaLengkapController::class, 'index'])->name('admin.data-siswa');
+    Route::get('/siswa/search', [SiswaLengkapController::class, 'search'])->name('admin.siswa.search');
     Route::get('/siswa/create', [SiswaLengkapController::class, 'create'])->name('admin.form-tambah-siswa');
     Route::post('siswa/create', [SiswaLengkapController::class, 'store'])->name('admin.siswa.store');
     Route::get('/siswa/edit/{siswa}', [SiswaLengkapController::class, 'edit'])->name('admin.form-edit-siswa');
     Route::put('/siswa/edit/{siswa}', [SiswaLengkapController::class, 'update'])->name('admin.siswa.update');
-    Route::delete('/siswa/destroy/{siswa}', [SiswaLengkapController::class, 'destroy'])->name('admin.siswa.destroy');
+    Route::delete('/siswa/destroy/{user}', [SiswaLengkapController::class, 'destroy'])->name('admin.siswa.destroy');
 
     // Route Manajemen Data Walikelas
     Route::get('/data-walikelas', [WaliKelasController::class, 'index'])->name('admin.data-walikelas');
+    Route::get('/walikelas/search', [WaliKelasController::class, 'search'])->name('admin.walikelas.search');
     Route::get('/walikelas/create', [WaliKelasController::class, 'create'])->name('admin.form-tambah-walikelas');
     Route::post('walikelas/create', [WaliKelasController::class, 'store'])->name('admin.walikelas.store');
     Route::get('/walikelas/edit/{walikelas}', [WaliKelasController::class, 'edit'])->name('admin.form-edit-walikelas');
@@ -87,16 +94,22 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
     Route::put('/petugas/edit/{petugas}', [PetugasController::class, 'update'])->name('admin.petugas.update');
     Route::delete('/petugas/destroy/{petugas}', [PetugasController::class, 'destroy'])->name('admin.petugas.destroy');
 
+    // Scanner QR Code untuk admin/petugas
+    Route::get('izin/scanner', function () {
+        return view('admin.izin.scanner');
+    })->middleware(['role:admin,petugas', 'auth'])->name('admin.izin.scanner');
+
     // Validasi izin (oleh admin/petugas)
-    Route::get('admin/validasi', [ValidasiController::class, 'index'])->name('admin.validasi.index');
-    Route::get('admin/validasi/{id}', [ValidasiController::class, 'show'])->name('admin.validasi.show');
-    Route::post('admin/validasi/{id}', [ValidasiController::class, 'proses'])->name('admin.validasi.proses');
-
-
-
+    Route::get('validasi', [ValidasiController::class, 'index'])->name('admin.validasi.index');
+    Route::get('validasi/{id}', [ValidasiController::class, 'show'])->name('admin.validasi.show');
+    Route::post('validasi/{id}', [ValidasiController::class, 'proses'])->name('admin.validasi.proses');
 
     // Route Laporan Izin
-    Route::get('/admin/izin', [IzinController::class, 'index'])->name('admin.izin.index');
+    Route::get('/izin', [IzinController::class, 'index'])->name('admin.izin.index');
+    Route::get('/izin/search', [IzinController::class, 'search'])->name('admin.izin.search');
+
+    // Route Scanner QR Code di Admin
+    Route::get('/izin/cetak/{id}/{token}', [IzinController::class, 'cetak'])->name('admin.izin.cetak');
 });
 
 // Route untuk Siswa (hanya siswa)
@@ -139,10 +152,13 @@ Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
     Route::post('/izin/upload/{izin}', [IzinSiswaController::class, 'uploadBukti'])->name('izin.upload');
 
     // Halaman QR setelah izin berhasil
-    Route::get('/izin/qr/{id}', [IzinSiswaController::class, 'showQr'])->name('siswa.izin.qr');
+    Route::get('/izin/qr/{id}/{token}', [IzinSiswaController::class, 'showQr'])
+        ->name('siswa.izin.qr');
 
     // Cetak izin (berdasarkan QR Code)
-    Route::get('/siswa/izin/cetak/{id}', [IzinSiswaController::class, 'cetak'])->name('siswa.izin.cetak');
+    // Route::get('/siswa/izin/cetak/{id}/{token}', [IzinSiswaController::class, 'cetak'])
+    //     ->name('siswa.izin.cetak');
+
 
     // Riwayat izin siswa
     Route::get('/izin/riwayat', [IzinSiswaController::class, 'riwayat'])->name('izin.riwayat');

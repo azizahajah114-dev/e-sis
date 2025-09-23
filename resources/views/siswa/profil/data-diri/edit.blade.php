@@ -4,7 +4,7 @@
             Ubah Data Diri
         </h1>
 
-        <form action="{{ route('siswa.profil.data-diri.update') }}" method="POST" class="space-y-4">
+        <form action="{{ route('siswa.profil.data-diri.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @method('PUT')
 
@@ -62,6 +62,19 @@
                     </option>
                     @endforeach
                 </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Foto Profil</label>
+                <input type="file" name="foto"
+                    class="mt-1 block w-full text-sm text-gray-700 dark:text-gray-200 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+
+                @if($user->foto)
+                <div class="mt-2">
+                    <img src="{{ asset('storage/' . $user->foto) }}" alt="Foto Profil"
+                        class="w-24 h-24 rounded-full object-cover">
+                </div>
+                @endif
             </div>
 
 

@@ -21,6 +21,32 @@ class SiswaLengkapController extends Controller
         return view('admin.siswa.index', compact('siswaLengkap'));
     }
 
+    public function search(Request $request)
+    {
+        $keyword = $request->get('q');
+
+        $siswaLengkap = User::with('siswaLengkap.kelas', 'siswaLengkap.jurusan')
+            ->where('role', 'siswa')
+            ->where('nama', 'LIKE', "%{$keyword}%")
+            ->get()
+            ->map(function ($siswa) {
+                return [
+                    'id'            => $siswa->id,
+                    'nama'          => $siswa->nama,
+                    'kelas'         => $siswa->siswaLengkap->kelas->nama_kelas ?? null,
+                    'jurusan'       => $siswa->siswaLengkap->jurusan->nama_jurusan ?? null,
+                    'tempat_lahir'  => $siswa->siswaLengkap->tempat_lahir ?? null,
+                    'tanggal_lahir' => $siswa->siswaLengkap->tanggal_lahir ?? null,
+                    'jenis_kelamin' => $siswa->siswaLengkap->jenis_kelamin ?? null,
+                    'nomor_hp'      => $siswa->siswaLengkap->nomor_hp ?? null,
+                ];
+            });
+
+        return response()->json($siswaLengkap);
+    }
+
+
+
     public function create()
     {
         $users = User::where('role', 'siswa')->get(); // hanya siswa
@@ -75,9 +101,17 @@ class SiswaLengkapController extends Controller
         return redirect()->route('admin.data-siswa')->with('success', 'Data siswa berhasil diperbarui.');
     }
 
-    public function destroy(SiswaLengkap $siswa)
+    public function destroy(User $user)
     {
-        $siswa->delete();
-        return redirect()->route('admin.data-siswa')->with('success', 'Data siswa berhasil dihapus.');
+        // kalau ada biodata, hapus dulu
+        if ($user->siswaLengkap) {
+            $user->siswaLengkap->delete();
+        }
+
+        // hapus akun
+        $user->delete();
+
+        return redirect()->route('admin.data-siswa')
+            ->with('success', 'Akun dan biodata siswa berhasil dihapus.');
     }
 }

@@ -15,7 +15,8 @@ class WaliKelas extends Model
         'nama_walikelas',
         'kelas_id',
         'nomor_hp',
-        'status'
+        'status',
+        'foto'
     ];
 
     public function kelas() {

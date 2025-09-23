@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Kelas;
 use App\Http\Controllers\Controller;
 use App\Imports\UserImport;
+use App\Exports\UserFormatExport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -16,6 +17,21 @@ class UserController extends Controller
     {
         $kelas = Kelas::all();
         return view('admin.users.index', compact('kelas'));
+    }
+
+    public function searchKelas(Request $request)
+    {
+        $keyword = $request->get('q');
+
+        $kelas = Kelas::where('nama_kelas', 'LIKE', "%{$keyword}%")->get()
+            ->map(function ($k) {
+                return [
+                    'id' => $k->id,
+                    'nama_kelas' => $k->nama_kelas,
+                ];
+            });
+
+        return response()->json($kelas);
     }
 
 
@@ -46,10 +62,26 @@ class UserController extends Controller
             'file' => 'required|mimes:xlsx,csv,xls'
         ]);
 
-        Excel::import(new UserImport, $request->file('file'));
+        try {
+            Excel::import(new UserImport, $request->file('file'));
+            return redirect()->route('admin.data-pengguna')
+                ->with('success', 'Data berhasil diimport!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+            }
 
-        return redirect()->route('admin.data-pengguna')
-            ->with('success', 'Data berhasil diimport!');
+            return redirect()->route('admin.data-pengguna')
+                ->with('import_errors', $errors);
+        }
+    }
+
+
+    public function downloadFormat()
+    {
+        return Excel::download(new UserFormatExport, 'format_user.xlsx');
     }
 
     public function create()

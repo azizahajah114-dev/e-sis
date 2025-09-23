@@ -15,6 +15,22 @@ class KelasController extends Controller
         return view('admin.kelas.index', compact('kelas'));
     }
 
+    public function search(Request $request)
+    {
+        $keyword = $request->get('q');
+
+        $kelas = Kelas::where('nama_kelas', 'LIKE', "%{$keyword}%")->get()
+            ->map(function ($k) {
+                return [
+                    'id' => $k->id,
+                    'nama_kelas' => $k->nama_kelas,
+                ];
+            });
+
+        return response()->json($kelas);
+    }
+
+
     public function create()
     {
         return view('admin.kelas.create');

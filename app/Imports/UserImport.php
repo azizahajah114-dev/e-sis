@@ -4,33 +4,53 @@ namespace App\Imports;
 
 use App\Models\User;
 use App\Models\Kelas;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
 
-class UserImport implements ToCollection, WithHeadingRow
+class UserImport implements ToModel, WithHeadingRow, WithValidation
 {
-    public function collection(Collection $rows)
+    public function model(array $row)
     {
-        foreach ($rows as $row) {
-            // Normalisasi nama kelas (misalnya selalu kapital awal kata)
-            $namaKelas = ucwords(strtolower(trim($row['kelas'])));
+        // Normalisasi nama kelas
+        $namaKelas = ucwords(strtolower(trim($row['kelas'])));
 
-            // Cari kelas, kalau tidak ada buat baru
-            $kelas = Kelas::firstOrCreate(
-                ['nama_kelas' => $namaKelas],
-                ['nama_kelas' => $namaKelas]
-            );
+        // Cari atau buat kelas
+        $kelas = Kelas::firstOrCreate(
+            ['nama_kelas' => $namaKelas],
+            ['nama_kelas' => $namaKelas]
+        );
 
-            // Simpan user baru
-            User::create([
-                'nama'     => $row['nama'],
-                'nis'      => $row['nis'],
-                'password' => Hash::make($row['password'] ?? '12345678'), // default kalau kosong
-                'role'     => strtolower($row['role']), // ambil dari kolom "role" di Excel
-                'kelas_id' => $kelas->id,
-            ]);
-        }
+        return new User([
+            'nama'     => $row['nama'],
+            'nis'      => $row['nis'],
+            'password' => Hash::make($row['password'] ?? '12345678'),
+            'role'     => strtolower($row['role']),
+            'kelas_id' => $kelas->id,
+        ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            '*.nis' => [
+                'required',
+                Rule::unique('users', 'nis'),
+            ],
+            '*.nama' => 'required|string|max:255',
+            '*.password' => 'nullable|min:6',
+            '*.role' => 'required|in:siswa,petugas',
+        ];
+    }
+
+    public function customValidationMessages()
+    {
+        return [
+            '*.nis.unique'   => 'NIS :input sudah terdaftar!',
+            '*.nis.required' => 'NIS wajib diisi.',
+        ];
     }
 }

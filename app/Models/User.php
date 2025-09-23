@@ -22,7 +22,8 @@ class User extends Authenticatable
         'nis',
         'password',
         'role',
-        'kelas_id'
+        'kelas_id',
+        'foto'
     ];
 
     /**

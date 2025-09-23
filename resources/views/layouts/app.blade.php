@@ -15,8 +15,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
-            
+        <div class="min-h-screen bg-[#eff5fe] flex">
+
             <!-- Sidebar berdasarkan role -->
             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'petugas']))
                 @include('layouts.partials.nav-admin')
@@ -29,5 +29,6 @@
                 {{ $slot }}
             </main>
         </div>
+        <script src="//unpkg.com/alpinejs" defer></script>
     </body>
 </html>

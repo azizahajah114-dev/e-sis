@@ -30,16 +30,19 @@ class ValidasiController extends Controller
     public function proses(Request $request, $id)
     {
         $request->validate([
-            'tanggal_kembali' => 'required|date',
-            'jam_kembali'     => 'required|date_format:H:i',
+            'aksi' => 'required|in:kembali_sekolah,pulang_rumah,izin_lebih_dari_sehari',
+            'tanggal_kembali' => 'nullable|date',
+            'jam_kembali'     => 'nullable|date_format:H:i',
         ]);
 
         $izin = Izin::findOrFail($id);
+
 
         $izin->update([
             'tanggal_kembali' => $request->tanggal_kembali,
             'jam_kembali'     => $request->jam_kembali,
             'status_izin'     => 'disetujui',
+            'hasil_validasi' => $request->aksi
         ]);
 
         return redirect()->route('admin.validasi.index')

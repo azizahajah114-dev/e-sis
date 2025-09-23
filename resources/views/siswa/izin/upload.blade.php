@@ -14,7 +14,7 @@
         @if($izin->bukti_izin)
             <div class="mt-4">
                 <p class="font-semibold">Bukti sudah diunggah:</p>
-                <img src="{{ asset('storage/' . $izin->bukti_izin) }}" 
+                <img src="{{ asset('storage/' . $izin->bukti_izin) }}"
                      alt="Bukti Izin" class="w-48 border rounded">
             </div>
         @else

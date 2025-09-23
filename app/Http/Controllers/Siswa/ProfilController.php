@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\User;
 use App\Models\Jurusan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProfilController extends Controller
 {
@@ -26,14 +29,13 @@ class ProfilController extends Controller
     public function editDataDiri()
     {
         $user = auth()->user();
-
         // kalau belum ada, kasih instance kosong (supaya di blade tidak error)
         $siswa = $user->siswaLengkap ?? new \App\Models\SiswaLengkap();
 
         $kelas = Kelas::all();
         $jurusan = Jurusan::all();
 
-        return view('siswa.profil.data-diri.edit', compact('siswa', 'kelas', 'jurusan'));
+        return view('siswa.profil.data-diri.edit', compact('siswa', 'kelas', 'jurusan', 'user'));
     }
 
 
@@ -48,8 +50,30 @@ class ProfilController extends Controller
             'nomor_hp'       => 'nullable|string|max:20',
             'kelas_id'       => 'required|exists:kelas,id',
             'jurusan_id'     => 'required|exists:jurusan,id',
+            'foto'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // validasi foto
         ]);
 
+        if ($request->hasFile('foto')) {
+            // bikin folder sesuai NIS atau nama
+            $folder = 'profil-siswa/' . str_replace(' ', '_', strtolower($user->nama));
+
+            // simpan file dengan nama unik
+            $filename = time() . '_' . $request->file('foto')->getClientOriginalName();
+            $path = $request->file('foto')->storeAs($folder, $filename, 'public');
+
+            // hapus foto lama
+            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            // update foto baru
+            $user->update([
+                'foto' => $path
+            ]);
+        }
+
+
+        // Simpan data siswa_lengkap
         if ($user->siswaLengkap) {
             $user->siswaLengkap->update($validated);
         } else {
@@ -59,6 +83,7 @@ class ProfilController extends Controller
         return redirect()->route('siswa.profil.data-diri')
             ->with('success', 'Data diri berhasil disimpan.');
     }
+
 
 
 

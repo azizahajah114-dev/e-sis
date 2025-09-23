@@ -16,7 +16,7 @@ class PetugasSeeder extends Seeder
     {
         {
         User::create([
-            'nama' => 'Budi',
+            'nama' => 'Budiono',
             'nis' => '111111',
             'password' => Hash::make('password'),
             'role' => 'petugas'

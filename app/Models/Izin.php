@@ -20,10 +20,13 @@ class Izin extends Model
         'jam_keluar',
         'jam_kembali',
         'tanggal',
+        'tanggal_kembali',
         'qr_code',
         'bukti_izin',
         'status_izin',
-        'disetujui_oleh',
+        'hasil_validasi',
+        'token'
+        // 'disetujui_oleh',
     ];
 
     // Relasi ke User (siswa yang mengajukan izin)
