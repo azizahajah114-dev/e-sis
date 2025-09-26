@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ValidasiController;
 use App\Http\Controllers\Siswa\IzinController as IzinSiswaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\ProfilController;
+use App\Http\Controllers\Siswa\DashboardController as DashboardSiswaController;
 use App\Http\Controllers\Admin\DashboardController as DashboardAdminController;
 use App\Exports\UserFormatExport;
 use App\Http\Controllers\Admin\UserExportController;
@@ -18,7 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing-page');
 });
 
 Route::get('/dashboard', function () {
@@ -115,9 +116,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
 // Route untuk Siswa (hanya siswa)
 Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
     // Route Dashboard Siswa
-    Route::get('/dashboard', function () {
-        return view('siswa.dashboard');
-    })->name('siswa.dashboard');
+    Route::get('/dashboard', [DashboardSiswaController::class, 'index'])->name('siswa.dashboard');
 
     // Route Manajemen Biodata Siswa
     Route::prefix('profil')->group(function () {

@@ -1,0 +1,12 @@
+services:
+  soketi:
+    image: quay.io/soketi/soketi:latest
+    container_name: soketi
+    ports:
+      - "6001:6001"   # port websockets
+      - "9601:9601"   # dashboard soketi
+    environment:
+      DEBUG: "1"
+      DEFAULT_APP_ID: "myapp-id"
+      DEFAULT_APP_KEY: "myapp-key"
+      DEFAULT_APP_SECRET: "myapp-secret"
