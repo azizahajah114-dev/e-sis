@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ValidasiController;
 use App\Http\Controllers\Siswa\IzinController as IzinSiswaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\ProfilController;
+use App\Http\Controllers\Siswa\DashboardController as DashboardSiswaController;
 use App\Http\Controllers\Admin\DashboardController as DashboardAdminController;
 use App\Exports\UserFormatExport;
 use App\Http\Controllers\Admin\UserExportController;
@@ -18,7 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('landingpage');
 });
 
 Route::get('/dashboard', function () {
@@ -127,6 +128,8 @@ Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
         Route::get('/data-diri', [ProfilController::class, 'dataDiri'])->name('siswa.profil.data-diri');
         Route::get('/data-diri/edit', [ProfilController::class, 'editDataDiri'])->name('siswa.profil.data-diri.edit');
         Route::put('/data-diri', [ProfilController::class, 'updateDataDiri'])->name('siswa.profil.data-diri.update');
+        // update foto profil 
+        // Route::put('/data-diri/edit/update-foto', [ProfilController::class, 'updateFoto'])->name('siswa.profil.update-foto');
 
         // Pengaturan siswa
         Route::get('/pengaturan', [ProfilController::class, 'pengaturan'])->name('siswa.profil.pengaturan');
@@ -136,6 +139,8 @@ Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
         // Walikelas
         Route::get('/walikelas', [ProfilController::class, 'walikelas'])->name('siswa.profil.walikelas');
 
+        //notifikasi
+        Route::get('/notifikasi', [ProfilController::class, 'notifikasi'])->name('siswa.profil.notifikasi');
 
         // Route Manajemen Pengajuan Form
         Route::get('/form-izin')->name('form-izin');
@@ -143,6 +148,8 @@ Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
     });
 
     // Route Manajemen Pengajuan Izin
+    Route::get('/izin/index', [IzinSiswaController::class, 'index'])->name('izin.index'); //index
+
     // Formulir pengajuan izin (tahap 1)
     Route::get('/izin', [IzinSiswaController::class, 'create'])->name('izin.create');
     Route::post('/izin', [IzinSiswaController::class, 'store'])->name('izin.store');

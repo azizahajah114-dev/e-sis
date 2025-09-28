@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="p-6">
-        <h1 class="text-xl font-bold mb-4">Tambah Petugas</h1>
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg mx-auto mt-10">
+        <h1 class="text-xl font-bold mb-4 text-center">Tambah Petugas</h1>
 
         <form action="{{ route('admin.petugas.store') }}" method="POST" class="space-y-4">
             @csrf
@@ -40,9 +40,9 @@
                 @enderror
             </div>
 
-            <div>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Simpan</button>
-                <a href="{{ route('admin.data-petugas') }}" class="bg-gray-500 text-white px-4 py-2 rounded">Kembali</a>
+            <div class="flex justify-between gap-4 text-center">
+                <a href="{{ route('admin.data-petugas') }}" class="w-full bg-gray-500 text-white px-4 py-2 rounded">Kembali</a>
+                <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded">Simpan</button>
             </div>
         </form>
     </div>

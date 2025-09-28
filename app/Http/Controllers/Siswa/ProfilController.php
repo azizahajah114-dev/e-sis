@@ -15,7 +15,11 @@ class ProfilController extends Controller
 {
     public function profil()
     {
-        return view('siswa.profil.index');
+        $user = auth()->user();
+        $siswa = $user->siswaLengkap;
+        return view('siswa.profil.index', compact('user', 'siswa'));
+
+        // return view('siswa.profil.index');
     }
 
     public function dataDiri()
@@ -84,8 +88,42 @@ class ProfilController extends Controller
             ->with('success', 'Data diri berhasil disimpan.');
     }
 
+    // update foto
+    // public function updateFoto(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'foto'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // validasi foto
+    //     ]);
+
+    //     $user = auth()->user();
 
 
+
+    //     $filename = time() . '_' . $request->file('foto')->getClientOriginalName();
+    //     $path = $request->file('foto')->storeAs($folder, $filename, 'public');
+
+    //     // hapus foto lama
+    //     if ($request->hasFile('foto')){
+    //        $folder = 'profil-siswa/' . str_replace(' ', '_', strtolower($user->nama));
+
+    //         // simpan file dengan nama unik
+    //         $filename = time() . '_' . $request->file('foto')->getClientOriginalName();
+    //         $path = $request->file('foto')->storeAs($folder, $filename, 'public');
+
+    //         // hapus foto lama
+    //         if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+    //             Storage::disk('public')->delete($user->foto);
+    //         }
+
+    //         // update foto baru
+    //         $user->update([
+    //             'foto' => $path
+    //         ]);
+    //     }
+
+    //     return redirect()->route('siswa.profil.data-diri')
+    //     ->with('success', 'Foto profil berhasil diperbarui.');
+    // }
 
     public function pengaturan()
     {
@@ -104,14 +142,15 @@ class ProfilController extends Controller
             $walikelas = \App\Models\Walikelas::where('kelas_id', $siswa->kelas_id)->first();
         }
 
-        return view('siswa.profil.walikelas.index', compact('walikelas'));
+        return view('siswa.profil.walikelas.index', compact('walikelas', 'user', 'siswa'));
     }
 
 
     public function editPassword()
     {
+        $user = auth()->user();
         $siswa = auth()->user()->siswaLengkap;
-        return view('siswa.profil.pengaturan.password.edit', compact('siswa'));
+        return view('siswa.profil.pengaturan.password.edit', compact('user', 'siswa'));
     }
 
     public function updatePassword(Request $request)
@@ -132,6 +171,15 @@ class ProfilController extends Controller
         ]);
 
         return redirect()->route('siswa.profil.pengaturan')->with('success', 'Password berhasil diperbarui');
+    }
+
+    // index notifikasi
+    public function notifikasi()
+    {
+        $user = auth()->user();
+        $siswa = auth()->user()->siswaLengkap;
+
+        return view('siswa.profil.notifikasi.index', compact('user', 'siswa'));
     }
 
     public function destroy()

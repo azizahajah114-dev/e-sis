@@ -18,6 +18,12 @@ use Illuminate\Support\Str;
 
 class IzinController extends Controller
 {
+    //panduan izin
+    public function index()
+    {
+        return view('siswa.izin.index');
+    }
+
     // Tampilkan form izin (tahap 1)
     public function create()
     {
