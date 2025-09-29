@@ -19,11 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-<<<<<<< HEAD
-    return view('landingpage');
-=======
     return view('landing-page');
->>>>>>> 44729f2d1557748f3ed6b27a816df3a86ea2792f
 });
 
 Route::get('/dashboard', function () {
