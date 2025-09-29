@@ -9,6 +9,12 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+window.Echo.channel("izin-channel")
+    .listen(".izin.created", (e) => {
+        alert("Izin baru masuk: " + e.izin.keterangan);
+    });
+
+
 document.addEventListener("DOMContentLoaded", () => {
     createIcons({ icons });
 

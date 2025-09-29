@@ -17,7 +17,13 @@
     },
     "dependencies": {
         "fullcalendar": "^6.1.19",
+<<<<<<< HEAD
         "lucide": "^0.544.0",
+=======
+        "laravel-echo": "^1.19.0",
+        "lucide": "^0.544.0",
+        "pusher-js": "^8.4.0",
+>>>>>>> 44729f2d1557748f3ed6b27a816df3a86ea2792f
         "swiper": "^12.0.2"
     }
 }

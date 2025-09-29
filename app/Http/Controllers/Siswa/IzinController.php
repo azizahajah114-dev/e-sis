@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Siswa;
 
+use App\Events\IzinCreated;
 use App\Http\Controllers\Controller;
 use App\Models\Izin;
 use App\Models\Petugas;
@@ -99,6 +100,8 @@ class IzinController extends Controller
 
         // update izin
         $izin->update(['qr_code' => $qrPath]);
+
+        event(new IzinCreated($izin));
 
         // Redirect ke halaman QR
         return redirect()->route('siswa.izin.qr', [

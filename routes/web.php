@@ -19,7 +19,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+<<<<<<< HEAD
     return view('landingpage');
+=======
+    return view('landing-page');
+>>>>>>> 44729f2d1557748f3ed6b27a816df3a86ea2792f
 });
 
 Route::get('/dashboard', function () {
@@ -116,9 +120,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin,petugas'])->group(functi
 // Route untuk Siswa (hanya siswa)
 Route::prefix('siswa')->middleware(['auth', 'role:siswa'])->group(function () {
     // Route Dashboard Siswa
-    Route::get('/dashboard', function () {
-        return view('siswa.dashboard');
-    })->name('siswa.dashboard');
+    Route::get('/dashboard', [DashboardSiswaController::class, 'index'])->name('siswa.dashboard');
 
     // Route Manajemen Biodata Siswa
     Route::prefix('profil')->group(function () {

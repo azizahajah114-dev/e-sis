@@ -1,4 +1,10 @@
 @import "swiper/swiper-bundle.css";
 @tailwind base;
 @tailwind components;
+<<<<<<< HEAD
 @tailwind utilities;
+=======
+@tailwind utilities;
+
+
+>>>>>>> 44729f2d1557748f3ed6b27a816df3a86ea2792f
