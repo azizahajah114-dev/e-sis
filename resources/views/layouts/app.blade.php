@@ -47,7 +47,7 @@
             <!-- Main Content -->
             <main class="p-6 pb-24 
                 @if(auth()->check() && array(auth()->user()->role, ['admin', 'petugas']))
-                md:flex-1 md:mt-0 md:mt-0
+                md:flex-1 md:mt-0 
                 @elseif(auth()->check() && auth()->user()->role === 'siswa')
                     mt-6 md:mt-0
                 @endif

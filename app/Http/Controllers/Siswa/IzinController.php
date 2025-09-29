@@ -54,61 +54,66 @@ class IzinController extends Controller
 
 
     // Simpan izin (tahap 1)
-    public function store(Request $request)
-    {
-        $request->validate([
-            'jenis_izin' => 'required|string',
-            'keterangan' => 'nullable|string',
-            'jam_keluar' => 'required',
-            'id_walikelas' => 'required|exists:walikelas,id',
-        ]);
+    // Simpan izin (tahap 1)
+public function store(Request $request)
+{
+    $request->validate([
+        'nis'          => 'required|exists:users,nis',
+        'jenis_izin'   => 'required|in:sakit,izin',
+        'keterangan'   => 'nullable|string',
+        'jam_keluar'   => 'required',
+        'id_walikelas' => 'required|exists:walikelas,id',
+    ]);
 
-        $user = auth()->user();
+    // cari user dari NIS
+    $user = User::where('nis', $request->nis)->first();
 
-        // Buat token unik
-        $token = Str::random(10);
-
-        $izin = Izin::create([
-            'user_id' => $user->id,
-            'id_walikelas' => $request->id_walikelas,
-            'jenis_izin' => $request->jenis_izin,
-            'keterangan' => $request->keterangan,
-            'jam_keluar' => $request->jam_keluar,
-            'tanggal' => now()->format('Y-m-d'),
-            'status_izin' => 'baru',
-            'token' => $token,
-        ]);
-
-        // Generate URL QR dengan id_walikelas, id_petugas (optional), dan token
-        $url = route('admin.izin.cetak', [
-            'id' => $izin->id,
-            'token' => $izin->token,
-        ], true) . '?id_walikelas=' . $izin->id_walikelas;
-
-
-        $qrPath = 'qr_codes/izin_' . $izin->id . '.png';
-
-        $result = Builder::create()
-            ->writer(new PngWriter()) // pakai PngWriter, nggak butuh Imagick
-            ->data($url)
-            ->size(300)
-            ->margin(20)
-            ->build();
-
-        // simpan file ke storage
-        Storage::disk('public')->put($qrPath, $result->getString());
-
-        // update izin
-        $izin->update(['qr_code' => $qrPath]);
-
-        event(new IzinCreated($izin));
-
-        // Redirect ke halaman QR
-        return redirect()->route('siswa.izin.qr', [
-            'id' => $izin->id,
-            'token' => $izin->token, // tambahkan token
-        ])->with('success', 'Izin berhasil diajukan!');
+    // ambil petugas aktif
+    $petugas = Petugas::where('status', 'aktif')->first();
+    if (!$petugas) {
+        return back()->with('error', 'Tidak ada petugas aktif, hubungi admin.');
     }
+
+    // buat izin baru
+    $izin = Izin::create([
+        'user_id'      => $user->id,
+        'id_walikelas' => $request->id_walikelas,
+        'jenis_izin'   => $request->jenis_izin,
+        'keterangan'   => $request->keterangan,
+        'jam_keluar'   => $request->jam_keluar,
+        'tanggal'      => now()->toDateString(),
+        'status_izin'  => 'baru',
+    ]);
+
+    // ✅ pakai nama route yang benar
+    $qrCodeUrl = route('izin.cetak', $izin->id) .
+        '?id_walikelas=' . $izin->id_walikelas .
+        '&id_petugas=' . $petugas->id;
+
+    $result = Builder::create()
+        ->writer(new PngWriter())   // pakai PNG writer
+        ->data($qrCodeUrl)
+        ->size(200)
+        ->margin(10)
+        ->build();
+
+    // pastikan folder qrcodes ada
+    if (!Storage::disk('public')->exists('qrcodes')) {
+        Storage::disk('public')->makeDirectory('qrcodes');
+    }
+
+    // simpan ke storage
+    $qrCodePath = 'qrcodes/izin_' . $izin->id . '.png';
+    Storage::disk('public')->put($qrCodePath, $result->getString());
+
+    // update DB
+    $izin->update([
+        'qr_code' => $qrCodePath,
+    ]);
+
+    return redirect()->route('izin.qr', $izin->id)
+        ->with('success', 'Pengajuan izin berhasil, silakan cetak lembar izin.');
+}
 
 
     public function showQr($id, $token)
